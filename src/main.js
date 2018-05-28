@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import BootstrapVue from "bootstrap-vue"
 // import App from './App.vue';
 
 
 Vue.use(Vuex);
+Vue.use(BootstrapVue);
 
 
 
@@ -12,9 +14,9 @@ const store = new Vuex.Store({
         modalCmp: null
     },
     mutations: {
-        showModal (state, name) {
+        toggleModal (state, name) {
           this.state.modalCmp = name;
-        }
+        },
     }
 })
 
@@ -29,9 +31,7 @@ const test = Vue.component('test', {
 
 const modal = Vue.component('modal', {
     template: `
-  <b-modal>
-  <component v-bind:is="current"></component>
-</b-modal>
+  <div>modaL</div>
   `,
     computed: {
       current () {
@@ -54,7 +54,7 @@ const app = new Vue({
   `,
     methods: {
       showModal (name) {
-        this.$store.commit('showModal', name);
+        this.$store.commit('toggleModal', name);
       }
     }
 });
@@ -63,11 +63,25 @@ const modalCmp = new Vue({
     el: '#modal',
     name: 'modal',
     store,
-    template: `<div>{{ cmp }}</div>`,
+    template: `
+      <b-modal ref="modal" @hidden="hideModal">
+        <component v-bind:is="cmp"></component>
+      </b-modal>
+    `,
     computed: {
       cmp () {
         return this.$store.state.modalCmp;
       }
+    },
+    methods: {
+        hideModal () {
+            this.$store.commit('toggleModal', null);
+        }
+    },
+    watch: {
+        cmp (val) {
+            this.$refs.modal[val ? 'show' : 'hide']();
+        }
     }
 });
 
